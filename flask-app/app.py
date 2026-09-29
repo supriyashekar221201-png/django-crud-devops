@@ -11,6 +11,7 @@ employees = [
         "salary": 50000
     }
 ]
+next_id = 2
 
 @app.route("/health")
 def health():
@@ -22,10 +23,18 @@ def get_employees():
 
 @app.route("/employees", methods=["POST"])
 def create_employee():
+    global next_id
+
     data = request.get_json()
 
+    required = ["name", "email", "department", "position", "salary"]
+
+    for field in required:
+        if field not in data:
+            return {"error": f"Missing field: {field}"}, 400
+
     new_employee = {
-        "id": len(employees) + 1,
+        "id": next_id,
         "name": data["name"],
         "email": data["email"],
         "department": data["department"],
@@ -34,6 +43,7 @@ def create_employee():
     }
 
     employees.append(new_employee)
+    next_id += 1
 
     return new_employee, 201
 
