@@ -15,3 +15,6 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 RUN chown -R appuser:appuser /app
 USER appuser
+EXPOSE 8000
+
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
