@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: django-deployment
+  namespace: django-crud-devops
+  labels:
+    app: django
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: django-pod
+
+  template:
+    metadata:
+      labels:
+        app: django-pod
+
+    spec:
+      containers:
+        - name: django-container
+          image: django-employee-app:v2
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: DJANGO_DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: django-config
+                  key: DJANGO_DEBUG
+
+            - name: DJANGO_ALLOWED_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: django-config
+                  key: DJANGO_ALLOWED_HOSTS
+
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: DJANGO_SECRET_KEY
+
+          ports:
+            - containerPort: 8000
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
