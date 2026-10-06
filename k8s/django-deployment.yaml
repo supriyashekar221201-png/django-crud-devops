@@ -43,6 +43,26 @@ spec:
                 secretKeyRef:
                   name: django-secret
                   key: DJANGO_SECRET_KEY
+            - name: DB_NAME
+              value: employeesdb
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: DB_USER
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: DB_PASSWORD
+
+            - name: DB_HOST
+              value: mysql-service
+
+            - name: DB_PORT
+              value: "3306"
 
           ports:
             - containerPort: 8000
